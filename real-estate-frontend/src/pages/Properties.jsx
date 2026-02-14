@@ -1,47 +1,50 @@
 import { useState } from "react";
-import { faker } from "@faker-js/faker";
 
-const propertyImages = [
-  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
-  "https://images.unsplash.com/photo-1605146768851-eda79da39897",
-  "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2",
-  "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c",
-  "https://images.unsplash.com/photo-1572120360610-d971b9d7767c",
-  "https://images.unsplash.com/photo-1600566752227-8f7b0b6c4d3f",
+
+
+/* ===== STATIC PROPERTY DATA (Stable & Safe) ===== */
+const propertyData = [
+  {
+    id: 1,
+    title: "3 BHK Luxury Flat",
+    location: "Wardha Road",
+    price: 7200000,
+    bhk: 3,
+    status: "Available",
+    featured: true,
+    image: "https://picsum.photos/600/400?random=1"
+  },
+  {
+    id: 2,
+    title: "2 BHK Apartment",
+    location: "Manish Nagar",
+    price: 4800000,
+    bhk: 2,
+    status: "Negotiation",
+    featured: false,
+    image: "https://picsum.photos/600/400?random=2"
+  },
+  {
+    id: 3,
+    title: "Villa",
+    location: "Pratap Nagar",
+    price: 11000000,
+    bhk: 4,
+    status: "Sold",
+    featured: true,
+    image: "https://picsum.photos/600/400?random=3"
+  },
+  {
+    id: 4,
+    title: "1 BHK Apartment",
+    location: "Dharampeth",
+    price: 3000000,
+    bhk: 1,
+    status: "Available",
+    featured: false,
+    image: "https://picsum.photos/600/400?random=4"
+  }
 ];
-
-const nagpurLocalities = [
-  "Manish Nagar",
-  "Wardha Road",
-  "MIHAN",
-  "Koradi Road",
-  "Pratap Nagar",
-  "Trimurti Nagar",
-  "Hingna",
-  "Dharampeth"
-];
-
-const statuses = ["Available", "Sold", "Negotiation"];
-
-const generateProperties = () =>
-  Array.from({ length: 15 }, (_, i) => ({
-    id: i + 1,
-    title: `${faker.number.int({ min: 1, max: 4 })} BHK Apartment`,
-    location:
-      nagpurLocalities[
-        Math.floor(Math.random() * nagpurLocalities.length)
-      ],
-    price: faker.number.int({ min: 2000000, max: 9000000 }),
-    bhk: faker.number.int({ min: 1, max: 4 }),
-    status: statuses[Math.floor(Math.random() * statuses.length)],
-    featured: Math.random() > 0.7,
-    image:
-      propertyImages[
-        Math.floor(Math.random() * propertyImages.length)
-      ]
-  }));
-
-const propertyData = generateProperties();
 
 function Properties() {
   const [search, setSearch] = useState("");
@@ -50,17 +53,21 @@ function Properties() {
     JSON.parse(localStorage.getItem("wishlist")) || []
   );
 
+  /* ===== Wishlist ===== */
   const toggleWishlist = (property) => {
     let updated;
+
     if (wishlist.find((item) => item.id === property.id)) {
       updated = wishlist.filter((item) => item.id !== property.id);
     } else {
       updated = [...wishlist, property];
     }
+
     setWishlist(updated);
     localStorage.setItem("wishlist", JSON.stringify(updated));
   };
 
+  /* ===== Filtering ===== */
   const filtered = propertyData.filter((property) => {
     return (
       property.location.toLowerCase().includes(search.toLowerCase()) &&
@@ -72,27 +79,35 @@ function Properties() {
     <div style={{ padding: "40px" }}>
       <h2>{filtered.length} Properties in Nagpur</h2>
 
-      <div style={{ marginBottom: "20px" }}>
-        <input
-          type="text"
-          placeholder="Search locality..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{ marginRight: "15px", padding: "8px" }}
-        />
+      {/* SEARCH + FILTER */}
+      <div className="filter-bar">
 
-        <select
-          onChange={(e) => setBhkFilter(e.target.value)}
-          style={{ padding: "8px" }}
-        >
-          <option value="All">All</option>
-          <option value="1">1 BHK</option>
-          <option value="2">2 BHK</option>
-          <option value="3">3 BHK</option>
-          <option value="4">4 BHK</option>
-        </select>
-      </div>
+  <div className="search-group">
+    <input
+      type="text"
+      placeholder="Search by locality..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+    />
+  </div>
 
+  <div className="select-group">
+    <select
+      value={bhkFilter}
+      onChange={(e) => setBhkFilter(e.target.value)}
+    >
+      <option value="All">All BHK</option>
+      <option value="1">1 BHK</option>
+      <option value="2">2 BHK</option>
+      <option value="3">3 BHK</option>
+      <option value="4">4 BHK</option>
+    </select>
+  </div>
+
+</div>
+
+
+      {/* PROPERTY CARDS */}
       {filtered.map((property) => (
         <div key={property.id} className="listing-card">
 
@@ -114,7 +129,15 @@ function Properties() {
               </span>
             )}
 
-            <img src={property.image} alt="property" />
+            <img
+              src={property.image}
+              alt="property"
+              style={{
+                width: "250px",
+                height: "170px",
+                objectFit: "cover"
+              }}
+            />
           </div>
 
           <div className="listing-info">
@@ -142,12 +165,21 @@ function Properties() {
           <div className="listing-price">
             <h2>₹ {property.price.toLocaleString()}</h2>
 
-            <button onClick={() => toggleWishlist(property)}>
-              {wishlist.find((item) => item.id === property.id)
-                ? "❤️ Saved"
-                : "🤍 Save"}
-            </button>
+            <button
+  className={
+    wishlist.find((item) => item.id === property.id)
+      ? "save-btn saved"
+      : "save-btn"
+  }
+  onClick={() => toggleWishlist(property)}
+>
+  {wishlist.find((item) => item.id === property.id)
+    ? "❤️ Saved"
+    : "🤍 Save"}
+</button>
+
           </div>
+
         </div>
       ))}
     </div>

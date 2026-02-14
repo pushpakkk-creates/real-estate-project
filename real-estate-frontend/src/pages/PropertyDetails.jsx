@@ -1,42 +1,56 @@
-import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { properties } from "../data/properties";
 
 function PropertyDetails() {
-  const images = [
-    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2",
-    "https://images.unsplash.com/photo-1605146768851-eda79da39897",
-    "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c"
-  ];
+  const { id } = useParams();
 
-  const [current, setCurrent] = useState(0);
+  const property = properties.find(
+    (p) => p.id === Number(id)
+  );
+
+  if (!property) {
+    return <h2>Property not found</h2>;
+  }
 
   return (
-    <div style={{ padding: "50px" }}>
+    <div style={{ padding: "60px" }}>
       <img
-        src={images[current]}
+        src={property.image}
         alt="property"
-        style={{ width: "100%", borderRadius: "10px" }}
+        style={{
+          width: "100%",
+          maxHeight: "400px",
+          objectFit: "cover",
+          borderRadius: "12px"
+        }}
       />
 
-      <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
-        {images.map((img, index) => (
-          <img
-            key={index}
-            src={img}
-            width="100"
-            style={{
-              cursor: "pointer",
-              border: current === index ? "3px solid #0077ff" : "none"
-            }}
-            onClick={() => setCurrent(index)}
-          />
-        ))}
-      </div>
+      <h2 style={{ marginTop: "20px" }}>
+        {property.title}
+      </h2>
 
-      <h2 style={{ marginTop: "20px" }}>3 BHK Luxury Flat</h2>
-      <p style={{ fontSize: "22px", color: "#0077ff" }}>₹ 72,00,000</p>
-      <p>📍 Wardha Road, Nagpur</p>
+      <p style={{ color: "#666" }}>
+        📍 {property.location}
+      </p>
 
-      <button style={{ marginTop: "20px", padding: "10px 20px" }}>
+      <h3 style={{ color: "#0077ff" }}>
+        ₹ {property.price.toLocaleString()}
+      </h3>
+
+      <p style={{ marginTop: "15px" }}>
+        {property.description}
+      </p>
+
+      <button
+        style={{
+          marginTop: "20px",
+          padding: "10px 20px",
+          background: "#0077ff",
+          color: "white",
+          border: "none",
+          borderRadius: "6px"
+        }}
+      >
         Show Interest
       </button>
     </div>
