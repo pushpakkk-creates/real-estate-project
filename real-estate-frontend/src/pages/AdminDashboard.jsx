@@ -1,36 +1,33 @@
-import DashboardLayout from "../components/DashboardLayout";
-
-const interests = [
-  { id: 1, property: "2 BHK Apartment", buyer: "Rahul Sharma", status: "Pending" },
-  { id: 2, property: "3 BHK Flat", buyer: "Anjali Verma", status: "Contacted" },
-  { id: 3, property: "Villa", buyer: "Suresh Patil", status: "Closed" }
-];
-
 function AdminDashboard() {
+  const leads = JSON.parse(localStorage.getItem("leads")) || [];
+
   return (
-    <DashboardLayout role="Admin">
-      <h2>Admin Dashboard</h2>
+    <div style={{ padding: "40px" }}>
+      <h2>Interested Buyers</h2>
 
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>Property</th>
-            <th>Buyer</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {interests.map((item) => (
-            <tr key={item.id}>
-              <td>{item.property}</td>
-              <td>{item.buyer}</td>
-              <td>{item.status}</td>
+      {leads.length === 0 ? (
+        <p>No leads yet.</p>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Buyer Phone</th>
+              <th>Date</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </DashboardLayout>
+          </thead>
+          <tbody>
+            {leads.map((lead, index) => (
+              <tr key={index}>
+                <td>{lead.propertyTitle}</td>
+                <td>{lead.buyerPhone}</td>
+                <td>{lead.date}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
 }
 

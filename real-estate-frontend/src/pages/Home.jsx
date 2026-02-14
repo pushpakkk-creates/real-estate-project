@@ -1,135 +1,187 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { properties } from "../data/properties";
 
 function Home() {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("Buy");
+  const [search, setSearch] = useState("");
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
+
+  useEffect(() => {
+    const recent = JSON.parse(localStorage.getItem("recent")) || [];
+    setRecentlyViewed(recent);
+  }, []);
+
+  const handleSearch = () => {
+    navigate(`/properties?type=${activeTab}&search=${search}`);
+  };
 
   return (
     <div>
 
-      {/* HERO SECTION */}
+      {/* HERO */}
       <section className="hero">
+        <div className="hero-box">
+
+          <div className="hero-tabs">
+            {["Buy", "Rent", "Commercial", "Plots/Land"].map((tab) => (
+              <button
+                key={tab}
+                className={activeTab === tab ? "active" : ""}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          <div className="hero-search-bar">
+            <input
+              type="text"
+              placeholder={`Search ${activeTab} properties in Nagpur...`}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <button onClick={handleSearch}>Search</button>
+          </div>
+
+        </div>
+      </section>
+
+      {/* STATS */}
+      <section className="stats-section">
         <div>
-          <h1>Find Your Dream Property in Nagpur</h1>
-          <p>Verified Listings | Trusted Broker | Transparent Deals</p>
-
-          <div className="hero-search">
-            <input type="text" placeholder="Search locality..." />
-            <button onClick={() => navigate("/properties")}>
-              Search
-            </button>
-          </div>
+          <h2>500+</h2>
+          <p>Properties Listed</p>
+        </div>
+        <div>
+          <h2>200+</h2>
+          <p>Happy Buyers</p>
+        </div>
+        <div>
+          <h2>50+</h2>
+          <p>Verified Sellers</p>
+        </div>
+        <div>
+          <h2>100%</h2>
+          <p>Broker Verified</p>
         </div>
       </section>
 
-      {/* FEATURED PROPERTIES */}
-      <section className="section">
-        <h2>Featured Properties</h2>
-        <p style={{ color: "#666", marginBottom: "30px" }}>
-          Premium listings curated by our admin broker.
-        </p>
+      {/* FEATURED */}
+      {/* FEATURED */}
+<section className="section">
+  <h2>Featured Buy Properties</h2>
 
-        <div className="property-grid">
-          {properties.map((property) => (
-            <div
-              key={property.id}
-              className="property-card"
-              onClick={() => navigate(`/property/${property.id}`)}
-              style={{ cursor: "pointer" }}
-            >
-              <img src={property.image} alt="property" />
+  <div className="property-grid">
+    {properties
+      .filter((property) => property.type === "Buy")
+      .slice(0, 3)
+      .map((property) => (
+        <div
+          key={property.id}
+          className="property-card"
+          onClick={() => navigate(`/property/${property.id}`)}
+          style={{ cursor: "pointer" }}
+        >
+          <img src={property.image} alt="property" />
+          <div className="property-info">
+            <h3>{property.title}</h3>
+            <p>{property.location}</p>
+            <div className="property-price">
+              ₹ {property.price.toLocaleString()}
+            </div>
+          </div>
+        </div>
+      ))}
+  </div>
+</section>
 
-              <div className="property-info">
-                <h3>{property.title}</h3>
-                <p>{property.location}</p>
-                <div className="property-price">
-                  ₹ {property.price.toLocaleString()}
+      {/* PROPERTY TYPES */}
+      
+<section className="section">
+  <h2>Browse by Property Type</h2>
+
+  <div className="type-grid">
+
+    <div className="type-card" onClick={() => navigate("/properties")}>
+      <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2" />
+      <h3>Apartments</h3>
+    </div>
+
+    <div className="type-card" onClick={() => navigate("/properties")}>
+      <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c" />
+      <h3>Villas</h3>
+    </div>
+
+    <div className="type-card" onClick={() => navigate("/properties")}>
+      <img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2" />
+      <h3>Commercial</h3>
+    </div>
+
+    <div className="type-card" onClick={() => navigate("/properties")}>
+      <img src="https://images.unsplash.com/photo-1501183638710-841dd1904471" />
+      <h3>Plots / Land</h3>
+    </div>
+
+  </div>
+</section>
+
+
+      {/* TESTIMONIALS */}
+<section className="section" style={{ background: "#f8fafc" }}>
+  <h2>What Our Clients Say</h2>
+
+  <div className="testimonial-grid">
+
+    <div className="testimonial-card">
+      <p>"Very smooth process. Admin handled everything professionally."</p>
+      <h4>Rahul Sharma</h4>
+    </div>
+
+    <div className="testimonial-card">
+      <p>"Best property deals in Nagpur. Highly recommended."</p>
+      <h4>Sneha Patil</h4>
+    </div>
+
+    <div className="testimonial-card">
+      <p>"Transparent communication and verified listings."</p>
+      <h4>Amit Deshmukh</h4>
+    </div>
+
+  </div>
+</section>
+
+
+      {/* RECENTLY VIEWED */}
+      {recentlyViewed.length > 0 && (
+        <section className="section">
+          <h2>Recently Viewed</h2>
+
+          <div className="property-grid">
+            {recentlyViewed.map((property) => (
+              <div
+                key={property.id}
+                className="property-card"
+                onClick={() => navigate(`/property/${property.id}`)}
+              >
+                <img src={property.image} alt="recent" />
+                <div className="property-info">
+                  <h3>{property.title}</h3>
                 </div>
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/property/${property.id}`);
-                  }}
-                >
-                  View Details
-                </button>
               </div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ marginTop: "30px" }}>
-          <button
-            onClick={() => navigate("/properties")}
-            style={{
-              padding: "10px 18px",
-              background: "#0077ff",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer"
-            }}
-          >
-            View All Properties →
-          </button>
-        </div>
-      </section>
-
-      {/* LOCALITIES */}
-      <section className="section">
-        <h2>Top Localities in Nagpur</h2>
-
-        <div className="localities-grid">
-          {[
-            "Manish Nagar",
-            "Wardha Road",
-            "MIHAN",
-            "Pratap Nagar",
-            "Trimurti Nagar",
-            "Dharampeth"
-          ].map((area, index) => (
-            <div
-              key={index}
-              style={{ cursor: "pointer" }}
-              onClick={() => navigate("/properties")}
-            >
-              {area}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* WHY CHOOSE US */}
-      <section className="section" style={{ background: "#f8fafc" }}>
-        <h2>Why Choose NagpurEstate?</h2>
-
-        <div className="why-grid" style={{ marginTop: "30px" }}>
-          <div>
-            <h3>✔ Verified Listings</h3>
-            <p>All properties are verified by our admin broker.</p>
+            ))}
           </div>
-
-          <div>
-            <h3>✔ Secure Communication</h3>
-            <p>Buyers and sellers are connected safely through admin.</p>
-          </div>
-
-          <div>
-            <h3>✔ Best Market Deals</h3>
-            <p>We help negotiate the best possible prices.</p>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="cta-section">
-        <h2>Want to Sell Your Property?</h2>
-        <p style={{ marginTop: "10px" }}>
-          List your property and connect with serious buyers.
-        </p>
-        <button onClick={() => navigate("/seller")}>
-          Post Your Property
+        <h2>Ready to Find Your Dream Home?</h2>
+        <p>Explore verified properties across Nagpur today.</p>
+        <button onClick={() => navigate("/properties")}>
+          Start Exploring
         </button>
       </section>
 
